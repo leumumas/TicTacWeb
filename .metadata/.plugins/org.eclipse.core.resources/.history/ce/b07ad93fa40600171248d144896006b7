@@ -1,0 +1,66 @@
+
+import java.awt.*;          
+import java.awt.event.*;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;       
+import javax.swing.event.*;
+
+
+public class SwingGUI extends JFrame {
+	
+	public Case [][] Cases; 
+	public JTextArea txArea, rxArea; 	
+ 	public JPanel  container;    
+ 	public GridLayout gl;
+    private Image Background;
+    private JLabel lblBackgroundImage = new JLabel();
+    	
+	public SwingGUI (String title)
+	{
+		super (title);
+		
+		container = new JPanel();
+        container.setLayout( new FlowLayout() );
+        container.setOpaque(false);
+        Cases = new Case[3][3];
+        gl = new GridLayout(3,3,0,7);
+        this.setLayout(gl);
+        lblBackgroundImage.setLayout(new FlowLayout());
+        try {
+        	Background = ImageIO.read(getClass().getResource("res/forest.bmp"));
+        	lblBackgroundImage.setIcon(new ImageIcon(Background));
+          } catch (Exception ex) {
+            System.out.println(ex);
+          }
+        lblBackgroundImage.setLayout(new BorderLayout());
+        for (int i = 0; i < 3; i++ )
+        { 
+        	for (int j = 0; j < 3; j++ )
+        	{
+        		Case Current  = new Case ();
+        		Cases[i][j] = Current;
+        		Cases[i][j].setOpaque(false);
+        		Cases[i][j].setContentAreaFilled(false);
+        		Cases[i][j].setBorderPainted(false);
+        		container.add (Cases[i][j]);
+        	}
+        }
+        //lblBackgroundImage.add(container);
+        add(lblBackgroundImage);
+	}
+	
+	public static void main (String[] args)
+	{
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        }
+		Frame f = new SwingGUI ("Tic-Tac-Chose");
+		f.pack ();
+		f.setLocationRelativeTo(null);
+		f.setVisible(true);
+	}
+
+}
