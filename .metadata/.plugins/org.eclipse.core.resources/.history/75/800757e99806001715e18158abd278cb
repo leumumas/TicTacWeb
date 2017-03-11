@@ -1,0 +1,150 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package demineur;
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.imageio.ImageIO;
+import java.io.*;
+
+/**
+ *
+ * @author Gillian Chaville
+ */
+public class Case extends JButton implements MouseListener
+{
+    public enum Type {
+        VIDE(0), MINE(1);
+            
+        private final int value;
+        private Type(int value) {
+            this.value = value;
+        }
+        
+        public String ToString() {
+            switch(this.value){
+                case 0: return "VIDE";
+                case 1: return "MINE";
+                default: return "";
+            }
+        }
+        
+        public int getValue() {
+            return value;
+        }
+    }
+    
+    // USED TO LOCATE THE ADJACNT CASES
+    public static final int NO = 0, N = 1, NE = 2, O = 3;
+    public static final int E = 4, SO = 5, S = 6, SE = 7;
+    
+    private Type type;
+    private int x, y;
+    private int valeur;
+    private boolean selected;
+    
+    public static boolean start = false;
+    
+    private Case[] adjacentes;
+    private Grid grid;
+    
+    public Case() {
+        type = Type.VIDE;
+        valeur = 0;
+        selected = false;
+         
+        adjacentes = new Case[8];
+        
+        this.setText("");
+        this.addMouseListener(this); 
+        this.setMinimumSize(new Dimension(20, 20));
+    
+    }
+    
+    public Case getAdjacente(int pos) { return adjacentes[pos]; }
+    public void setAdjacente(int pos, Case c) { 
+        adjacentes[pos] = c; 
+    }
+    
+    public int getPosX() { return x; }
+    public int getPosY() { return y; }
+    public void setPos(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    public int getValeur() { return valeur; }
+    public void setValeur(int v) {
+        valeur = v;
+    }
+    
+    public Type getType() { return type; }
+    public void setType(Type t) {
+        type = t;
+    }
+    
+    public void setGrid(Grid g) {
+        grid = g;
+    }
+    
+    // INCREASE BY THE VALUE OF ALL THE ADJACENT CASES IF THE CASE HIDE A BOMB
+    public void estMine() {
+        if(type == Type.MINE){
+            for(int i = 0; i < 8; i++) {
+                if(adjacentes[i] != null) {
+                    if(adjacentes[i].type != Type.MINE)
+                        adjacentes[i].valeur++;
+                }
+            }
+        }
+    }
+    
+    // DEMINE IF NOT ALREADY DONE
+    public void deminer() {
+        if (!selected) {
+            switch(type.getValue()) {
+               case 0: this.setBackground(Color.DARK_GRAY); 
+                       this.setText(String.valueOf(valeur));
+                       if (!grid.estMort())
+                            GameMode.getInstance().updateNbScorableCases();
+                       break;
+               case 1: this.setBackground(Color.RED); 
+                       this.setText("X");
+                       if (!grid.estMort())
+                            GameMode.getInstance().updateNbBombsFound();
+                       break;
+            }
+        }
+    }
+	
+    
+    public void mousePressed(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {}
+
+    // EVENT HANDLER CALLED WHEN MOUVE HOVER A CASE
+    public void mouseEntered(MouseEvent e) {
+        if (selected) {
+            if(type.getValue() == 1)
+                this.setToolTipText(type.ToString());
+        } else {
+            // SHOW THE NUMBER OF BOMB NEAR TO
+            this.setToolTipText(valeur + " bombes autour !");
+            //this.setToolTipText(type.ToString()); // used for debug
+        }
+    }
+    
+    public void mouseExited(MouseEvent e) {}
+
+    // EVENT HANDLER CALLED WHEN A CASE IS CLICKED
+    public void mouseClicked(MouseEvent e) {
+       if (!start) {
+           start = true;
+           GameMode.getInstance().timer.start();
+       }
+       deminer();
+    }
+}
