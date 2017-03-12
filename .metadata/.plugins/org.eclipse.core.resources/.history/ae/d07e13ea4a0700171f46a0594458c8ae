@@ -82,38 +82,21 @@ public class Case extends JButton implements MouseListener
 
     // EVENT HANDLER CALLED WHEN A CASE IS CLICKED
     public void mouseClicked(MouseEvent e) {
-    	switch (valeur) {
-		case 0:
-			tileChange(1);
-	        break;
-		case 1:
-			tileChange(2);
-	        break;
-		case 2:
-			tileChange(0);
-	        break;
-		default:
-			tileChange(1);
-	}
-       
+       if (!start) {
+    	   
+       }
     }
     
     public void tileChange(int val) {
     	switch (val) {
     		case 0:
     	        this.setIcon(new ImageIcon(EmptyTile));
-    	        break;
     		case 1:
     	        this.setIcon(new ImageIcon(XTile));
-    	        break;
     		case 2:
     	        this.setIcon(new ImageIcon(OTile));
-    	        break;
     		default:
-    	        this.setIcon(new ImageIcon(EmptyTile));
     	}
-        valeur = val;
-        System.out.println("valeur = " + valeur);
     }
     
 }
