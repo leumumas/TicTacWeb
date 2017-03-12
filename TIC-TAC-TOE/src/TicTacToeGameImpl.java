@@ -1,6 +1,5 @@
 import java.rmi.server.*;
 import java.rmi.*;
-import java.util.Hashtable;
 
 public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeGame {
 
@@ -8,7 +7,7 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 	
 	private char[][] grid;
 	
-	public TicTacPlayer client = null, ai = null;
+	public TicTacPlayerImpl client = null, ai = null;
 
 	public TicTacToeGameImpl() throws RemoteException {}
 	
@@ -26,8 +25,8 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 			throw new RemoteException();
 		}
 		System.out.println("New Game...");
-		client = new TicTacPlayer(typeXO);
-		ai = new TicTacPlayer(aiType);
+		client = new TicTacPlayerImpl(typeXO);
+		ai = new TicTacPlayerImpl(aiType);
 		
 		grid = new char[3][3];
 		
@@ -40,7 +39,7 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 			throw new RemoteException() ;
 			
 		if (checkRow(tileX, tileY) == 3 || checkColumn(tileX, tileY) == 3 || checkDiagonal(tileX, tileY) == 3) {
-			client.youWin();
+			gameIssue(true);
 		}
 		else {
 			/*ai play return int[2] tileX, tileY
@@ -68,7 +67,7 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 		}
 		return buf;		
 	}
-	
+
 	public int checkDiagonal(int tileX, int tileY) {
 		int i, j = 0, buf = 0;
 		for (i = 0; i < grid[tileY].length; i++) {
@@ -80,12 +79,18 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 	}
 	
 	@Override
+	public void gameIssue(boolean issue) throws RemoteException {
+		client.setPlayerIssue(issue);
+		ai.setPlayerIssue(!issue);
+	}
+	
+	@Override
 	public void changePlayerType(char typeXO, char newtypeXO) throws RemoteException {
  	      if (client == null) 
  	    	  throw new RemoteException() ;
  	      
- 	    client = new TicTacPlayer(newtypeXO);
- 	    ai  = new TicTacPlayer(typeXO);
+ 	    client.setTypeXO(newtypeXO);
+ 	    ai.setTypeXO(typeXO);
 	}
 	
 	@Override
