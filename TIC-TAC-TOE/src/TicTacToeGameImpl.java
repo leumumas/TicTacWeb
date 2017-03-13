@@ -1,4 +1,5 @@
 import java.rmi.server.*;
+import java.util.concurrent.TimeUnit;
 import java.rmi.*;
 
 public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeGame {
@@ -7,11 +8,16 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 	
 	private GameState gameState;
 	
-	private int[][] grid;
+	private int[][] grid = new int[3][3];
 	
-	public TicTacPlayerImpl client = null, ai = null;
+	public TicTacPlayerImpl client = null;
+	public AIPlayerMinimax ai = null;
 
-	public TicTacToeGameImpl() throws RemoteException {}
+	public TicTacToeGameImpl() throws RemoteException {
+		for(int row = 0; row < 3; row++)
+			for(int col = 0; col < 3; col++)
+				grid[row][col] = 0;
+	}
 	
 	@Override
 	public TicTacPlayer newPlayer(int typeXO) throws RemoteException {
@@ -28,7 +34,7 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 		}
 		System.out.println("New Game...");
 		client = new TicTacPlayerImpl(typeXO);
-		ai = new TicTacPlayerImpl(aiType);
+		ai = new AIPlayerMinimax(grid, aiType);
 		
 		grid = new int[3][3];
 		gameState = GameState.PLAYING; 
@@ -37,42 +43,32 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 	}
 	
 	@Override
-	public void playTurn(int tileX, int tileY) throws RemoteException {
+	public void playTurn(int tileX, int tileY) throws RemoteException, InterruptedException {
 		if(client == null)
 			throw new RemoteException() ;
-		
-		int clientTypeXO = client.getTypeXO();
-		grid[tileX][tileY] = clientTypeXO;
-		gameState = GameState.CLIENT_TURN; 
-		if (checkRow(tileX, tileY) == 3 || checkColumn(tileX, tileY) == 3 || checkDiagonal(tileX, tileY) == 3) {
-			gameIssue(true);
-		}
-		else {
-			int aiTypeXO = ai.getTypeXO();
-			int[] aiPlay =  getRandomInt(tileX, tileY);
-			grid[aiPlay[0]][aiPlay[1]] = aiTypeXO;
-			gameState = GameState.AI_TURN; 
-			client.setAiPlay(aiPlay);
-			if (checkRow(aiPlay[0], aiPlay[1]) == 3 || checkColumn(aiPlay[0], aiPlay[1]) == 3 || checkDiagonal(aiPlay[0], aiPlay[1]) == 3) {
-				gameIssue(false);
+	
+		if(grid[tileX][tileY] == 0 && gameState != GameState.ENDED) {
+			int clientTypeXO = client.getTypeXO();
+			grid[tileX][tileY] = clientTypeXO;
+			gameState = GameState.CLIENT_TURN; 
+			client.setClientPlay(new int[] {tileX, tileY});
+			TimeUnit.MILLISECONDS.sleep(50);
+			if (checkRow(tileX, tileY) == 3 || checkColumn(tileX, tileY) == 3 || checkDiagonal(tileX, tileY) == 3) {
+				gameIssue(true);
+			}
+			else {
+				ai.UpdateGrid(grid);
+				int aiTypeXO = ai.getTypeXO();
+				int[] aiPlay = ai.Move();
+				grid[aiPlay[0]][aiPlay[1]] = aiTypeXO;
+				gameState = GameState.AI_TURN; 
+				client.setAiPlay(aiPlay);
+				TimeUnit.MILLISECONDS.sleep(50);
+				if (checkRow(aiPlay[0], aiPlay[1]) == 3 || checkColumn(aiPlay[0], aiPlay[1]) == 3 || checkDiagonal(aiPlay[0], aiPlay[1]) == 3) {
+					gameIssue(false);
+				}
 			}
 		}
-		System.out.println("Working amen !");
-	}
-	
-	private int[] getRandomInt(int eX, int eY) {
-		int[] r = new int[2];
-		r[0] = (int)(Math.random() * 3); 
-		while (r[0] != eX) {
-			r[0] = (int)(Math.random() * 3);
-		}
-		
-		r[1] = (int)(Math.random() * 3); 
-		while (r[1] != eY) {
-			r[1] = (int)(Math.random() * 3);
-		}
-		
-		return r;
 	}
 
 	public int checkRow(int tileX, int tileY) {
@@ -100,6 +96,14 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 				buf++;
 			j++;
 		}
+		
+		if(buf < 3) {
+			buf = 0;
+			for(i = 0, j = 2; i < 3; i++, j--)
+				if(grid[i][j] == grid[tileX][tileY])
+					buf++;
+		}
+			
 		return buf;		
 	}
 	

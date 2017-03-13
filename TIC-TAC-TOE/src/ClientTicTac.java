@@ -40,14 +40,12 @@ public class ClientTicTac extends SwingGUI {
 		}
 	}
 	
-	private class ButtonHandler implements ActionListener
-	{
+	private class ButtonHandler implements ActionListener {
 		int X, Y;
 		public ButtonHandler(int x, int y) {
 			X = x; Y = y;
 		}
-		public void actionPerformed (ActionEvent event)
-		{
+		public void actionPerformed (ActionEvent event) {
 			play(X,Y);
 		}
 	}
@@ -66,10 +64,15 @@ public class ClientTicTac extends SwingGUI {
 		while (true) {
 			try {
 				GameState state = tictac.getGameState();
-				if (state == GameState.AI_TURN) {
+				if(state == GameState.CLIENT_TURN) {
+					int[]cP = player.getClientPlay();
+					Cases[cP[0]][cP[1]].tileChange(1);
+				}
+				else if (state == GameState.AI_TURN) {
 					int[] aiP = player.receiveTurn();
 					Cases[aiP[0]][aiP[1]].tileChange(2);
-				} else if (state == GameState.ENDED) {
+				} 
+				else if (state == GameState.ENDED) {
 					issue = player.getGameIssue ();
 					if(issue)
 						System.out.println("Player win !");//play win anim

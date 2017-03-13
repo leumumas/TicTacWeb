@@ -82,7 +82,7 @@ public class Case extends JButton implements MouseListener
 
     // EVENT HANDLER CALLED WHEN A CASE IS CLICKED
     public void mouseClicked(MouseEvent e) {
-    	switch (valeur) {
+    	/*switch (valeur) {
 		case 0:
 			tileChange(1);
 	        break;
@@ -94,7 +94,7 @@ public class Case extends JButton implements MouseListener
 	        break;
 		default:
 			tileChange(1);
-	}
+	}*/
        
     }
     
@@ -113,7 +113,7 @@ public class Case extends JButton implements MouseListener
     	        this.setIcon(new ImageIcon(EmptyTile));
     	}
         valeur = val;
-        System.out.println("valeur = " + valeur);
+        //System.out.println("valeur = " + valeur);
     }
     
 }
