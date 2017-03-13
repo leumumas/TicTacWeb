@@ -90,19 +90,15 @@ public class ClientTicTac extends SwingGUI {
 					issue = player.getGameIssue ();
 					int casesRes = tictac.getCasesRes();
 					if(issue) {
-						state = tictac.getGameState(); //Pour éviter un second appel au mauvais tick
-						if (state == GameState.ENDED)
-							this.TitleText.setText("You WIN click: Restart");
+						this.TitleText.setText("You WIN click: Restart");
 						System.out.println("Player win !");//play win anim
 					}
 					else if (casesRes > 0){
-						state = tictac.getGameState(); //Pour éviter un second appel au mauvais tick
-						if (state == GameState.ENDED)
-							this.TitleText.setText("You LOSE click: Restart");
+						this.TitleText.setText("You LOSE click: Restart");
 						System.out.println("Player lose !");//play lose anim
 					}
 					else {
-						state = tictac.getGameState(); //Pour éviter un second appel au mauvais tick
+						state = tictac.getGameState();
 						if (state == GameState.ENDED)
 							this.TitleText.setText("Match nul click: Restart");						
 					}
