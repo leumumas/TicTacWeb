@@ -17,11 +17,14 @@ public class ClientTicTac extends SwingGUI {
 	
 	public ClientTicTac(String title) {
 		super(title);
+		
+		// Ajoute sur chaque Case un ActionListener qui envoie l'action du joueur au serveur
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				Cases[i][j].addActionListener( new ButtonHandler(i, j) );
+		
+		// Ajoute un Listener sur le texte du "Restart" pour recommencer la game 
 		this.TitleText.addMouseListener(new MouseAdapter() {
-            //override the method
         	public void mouseClicked(MouseEvent e) { //Event pour reset
         		if (TitleText.getText() != "Tic-Tac-Toe" ) {
         			ResetGrid();
@@ -34,18 +37,21 @@ public class ClientTicTac extends SwingGUI {
         		}
         	}
         });
+		
+		// Cree le stub à partir du squelette TicToeToeGame sur le serveur
 		try {
 			Registry rg =LocateRegistry.getRegistry("localhost",6767);
 		    tictac = (TicTacToeGame) rg.lookup("titactoegame");	
 		    System.out.println("Client connecting.....");
-		    player = tictac.newPlayer(1);
 		} 
 		catch (Exception e) {
 		     System.out.println("Erreur à l'accès de la game" + e);
 		}
+		selectType(1); // le client joue toujours les X
 	}
 	
-	public void selectType(int xo) { //player select if playing "x" or "o" do it at start
+	// Permet au joueur de choisir entre jouer 'X'ou 'O'
+	public void selectType(int xo) {
 		try {
 			player = tictac.newPlayer(xo);
 		}
@@ -54,6 +60,7 @@ public class ClientTicTac extends SwingGUI {
 		}
 	}
 	
+	// Class Handler pour chaque Case de la grille
 	private class ButtonHandler implements ActionListener {
 		int X, Y;
 		public ButtonHandler(int x, int y) {
@@ -64,7 +71,8 @@ public class ClientTicTac extends SwingGUI {
 		}
 	}
 	
-	public void play(int X, int Y) { // call it when click in a tile 
+	// Appelle la fonction playTurn(int X, int Y) du stub TicTacToeGame
+	public void play(int X, int Y) {
 		try {
 			tictac.playTurn(X, Y);
 		}
@@ -73,33 +81,34 @@ public class ClientTicTac extends SwingGUI {
 		}
 	}
 	
-	public void checkGameIssue () { // run it to check game issue
+	// Boucle true pour vérifier l'état de la game
+	public void checkGameIssue () {
 		boolean issue;
 		while (true) {
 			try {
 				GameState state = tictac.getGameState();
-				if(state == GameState.CLIENT_TURN) {
-					int[]cP = player.getClientPlay();
-					Cases[cP[0]][cP[1]].tileChange(1);
+				if(state == GameState.CLIENT_TURN) { 		// Si c'est le tour du joueur
+					int[]cP = player.getClientPlay();		// Recupère la Case sélectionnée
+					Cases[cP[0]][cP[1]].tileChange(1);		// Change la case en X 
 				}
-				else if (state == GameState.AI_TURN) {
-					int[] aiP = player.receiveTurn();
-					Cases[aiP[0]][aiP[1]].tileChange(2);
+				else if (state == GameState.AI_TURN) { 		// Si c'est le tour de l'IA
+					int[] aiP = player.getAIPlay();			// Recupère la Case sélectionnée
+					Cases[aiP[0]][aiP[1]].tileChange(2);	// Change la case en O
 				} 
-				else if (state == GameState.ENDED) {
-					issue = player.getGameIssue ();
+				else if (state == GameState.ENDED) {		// Si c'est la game est finie
+					issue = player.getGameIssue ();			// Vérifie si le client a gagné
 					int casesRes = tictac.getCasesRes();
 					if(issue) {
 						this.TitleText.setText("You WIN click: Restart");
-						System.out.println("Player win !");//play win anim
+						System.out.println("Player win !");	// Si issue = true, il a gagné 
 					}
 					else if (casesRes > 0){
 						this.TitleText.setText("You LOSE click: Restart");
-						System.out.println("Player lose !");//play lose anim
+						System.out.println("Player lose !"); // Sinon l'IA a gagné
 					}
 					else
 						this.TitleText.setText("Match nul click: Restart");
-						
+															// Ou il y a match nul
 				}
 			}
 			catch (RemoteException i) {}
@@ -107,7 +116,7 @@ public class ClientTicTac extends SwingGUI {
 	}
 
 	public static void main(String args[]) {
-		ClientTicTac client = new ClientTicTac("TicToeGame");
+		ClientTicTac client = new ClientTicTac("TicToeGame"); // Initialise la fenêtre de jeu
 		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		client.pack ();
 		client.setLocationRelativeTo(null);
