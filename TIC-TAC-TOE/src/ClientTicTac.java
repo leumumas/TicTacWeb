@@ -1,6 +1,14 @@
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+
+import javax.swing.JFrame;
 
 public class ClientTicTac extends SwingGUI {
 
@@ -9,21 +17,38 @@ public class ClientTicTac extends SwingGUI {
 	
 	public ClientTicTac(String title) {
 		super(title);
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				Cases[i][j].addActionListener( new ButtonHandler(i, j) );
 		try {
 			Registry rg =LocateRegistry.getRegistry("localhost",6767);
 		    tictac = (TicTacToeGame) rg.lookup("titactoegame");	
+		    System.out.println("Client connecting.....");
+		    player = tictac.newPlayer(1);
 		} 
 		catch (Exception e) {
 		     System.out.println("Erreur à l'accès de la game" + e);
 		}
 	}
 	
-	public void selectType(char xo) { //player select if playing "x" or "o" do it at start
+	public void selectType(int xo) { //player select if playing "x" or "o" do it at start
 		try {
 			player = tictac.newPlayer(xo);
 		}
 		catch (Exception e) {
 			System.out.println("Erreur à la création d'un Joueur : " + e);
+		}
+	}
+	
+	private class ButtonHandler implements ActionListener
+	{
+		int X, Y;
+		public ButtonHandler(int x, int y) {
+			X = x; Y = y;
+		}
+		public void actionPerformed (ActionEvent event)
+		{
+			play(X,Y);
 		}
 	}
 	
@@ -40,11 +65,17 @@ public class ClientTicTac extends SwingGUI {
 		boolean issue;
 		while (true) {
 			try {
-				issue = player.getGameIssue ();
-				if(issue)
-					;//play win anim
-				else
-					;//play lose anim
+				GameState state = tictac.getGameState();
+				if (state == GameState.AI_TURN) {
+					int[] aiP = player.receiveTurn();
+					Cases[aiP[0]][aiP[1]].tileChange(2);
+				} else if (state == GameState.ENDED) {
+					issue = player.getGameIssue ();
+					if(issue)
+						System.out.println("Player win !");//play win anim
+					else
+						System.out.println("Player lose !");//play lose anim
+				}
 			}
 			catch (RemoteException i) {}
 		}
@@ -52,7 +83,10 @@ public class ClientTicTac extends SwingGUI {
 
 	public static void main(String args[]) {
 		ClientTicTac client = new ClientTicTac("TicToeGame");
+		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		client.pack ();
+		client.setLocationRelativeTo(null);
+		client.setVisible(true);
 		client.checkGameIssue ();
 	}
 }

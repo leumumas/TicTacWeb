@@ -1,6 +1,7 @@
 import java.rmi.*;
 
 public interface TicTacPlayer extends Remote {
-	void setTypeXO(char xo) throws RemoteException;
-	boolean getGameIssue() throws RemoteException;
+	public void setTypeXO(int xo) throws RemoteException;
+	public boolean getGameIssue() throws RemoteException;
+	public int[] receiveTurn() throws RemoteException;
 }

@@ -3,16 +3,19 @@ import java.rmi.*;
 
 public class TicTacPlayerImpl extends UnicastRemoteObject implements TicTacPlayer {
 
-	char typeXO;
+	int typeXO;
 	boolean bWinning;
+	public ClientTicTac clientRef = null;
+	int[] aiPlay;
 	
-	public TicTacPlayerImpl (char xo) throws RemoteException{
+	public TicTacPlayerImpl (int xo) throws RemoteException{
 		typeXO = xo;
 		bWinning = false;
+		aiPlay = new int[2];
 	}
 	
 	@Override
-	public void setTypeXO(char xo) throws RemoteException {
+	public void setTypeXO(int xo) throws RemoteException {
 		typeXO = xo;
 
 	}
@@ -22,8 +25,20 @@ public class TicTacPlayerImpl extends UnicastRemoteObject implements TicTacPlaye
 		return bWinning;
 	}
 	
+	@Override
+	public int[] receiveTurn() throws RemoteException {
+		return aiPlay;
+	}
+	
 	public void setPlayerIssue(boolean issue) {
 		bWinning = issue;
 	}
+	
+	public int getTypeXO() {
+		return typeXO;
+	}
 
+	public void setAiPlay(int[] play) {
+		aiPlay = play;
+	}
 }
