@@ -99,18 +99,6 @@ public class ClientTicTac extends SwingGUI {
 					issue = player.getGameIssue ();			// Vérifie si le client a gagné
 					int casesRes = tictac.getCasesRes();
 					if(issue) {
-<<<<<<< HEAD
-						this.TitleText.setText("You WIN click: Restart");
-						System.out.println("Player win !");	// Si issue = true, il a gagné 
-					}
-					else if (casesRes > 0){
-						this.TitleText.setText("You LOSE click: Restart");
-						System.out.println("Player lose !"); // Sinon l'IA a gagné
-					}
-					else
-						this.TitleText.setText("Match nul click: Restart");
-															// Ou il y a match nul
-=======
 						state = tictac.getGameState(); //Pour éviter un second appel au mauvais tick
 						if (state == GameState.ENDED)
 							this.TitleText.setText("You WIN click: Restart");
@@ -127,8 +115,6 @@ public class ClientTicTac extends SwingGUI {
 						if (state == GameState.ENDED)
 							this.TitleText.setText("Match nul click: Restart");						
 					}
-						
->>>>>>> b4edc7b177f6927d61c95d5ab92766a29c0fd8aa
 				}
 			}
 			catch (RemoteException i) {}
