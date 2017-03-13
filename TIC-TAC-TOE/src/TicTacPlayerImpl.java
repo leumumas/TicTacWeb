@@ -5,6 +5,7 @@ public class TicTacPlayerImpl extends UnicastRemoteObject implements TicTacPlaye
 
 	int typeXO;
 	boolean bWinning;
+	int casesRes;
 	public ClientTicTac clientRef = null;
 	int[] aiPlay;
 	int[] clientPlay;
@@ -50,5 +51,11 @@ public class TicTacPlayerImpl extends UnicastRemoteObject implements TicTacPlaye
 	@Override
 	public int[] getClientPlay() {
 		return clientPlay;
+	}
+
+	@Override
+	public int getCasesRes() throws RemoteException {
+		// TODO Auto-generated method stub
+		return casesRes;
 	}
 }

@@ -20,6 +20,20 @@ public class ClientTicTac extends SwingGUI {
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				Cases[i][j].addActionListener( new ButtonHandler(i, j) );
+		this.TitleText.addMouseListener(new MouseAdapter() {
+            //override the method
+        	public void mouseClicked(MouseEvent e) { //Event pour reset
+        		if (TitleText.getText() != "Tic-Tac-Toe" ) {
+        			ResetGrid();
+        			TitleText.setText("Tic-Tac-Toe");
+    				try {
+    					tictac.restartGame();
+					} catch (RemoteException e1) {
+					     System.out.println("Erreur au state" + e);
+					}
+        		}
+        	}
+        });
 		try {
 			Registry rg =LocateRegistry.getRegistry("localhost",6767);
 		    tictac = (TicTacToeGame) rg.lookup("titactoegame");	
@@ -74,10 +88,18 @@ public class ClientTicTac extends SwingGUI {
 				} 
 				else if (state == GameState.ENDED) {
 					issue = player.getGameIssue ();
-					if(issue)
+					int casesRes = player.getCasesRes();
+					if(issue) {
+						this.TitleText.setText("You WIN");
 						System.out.println("Player win !");//play win anim
-					else
+					}
+					else if (casesRes > 0){
+						this.TitleText.setText("You LOSE");
 						System.out.println("Player lose !");//play lose anim
+					}
+					else
+						this.TitleText.setText("Match nul");
+						
 				}
 			}
 			catch (RemoteException i) {}

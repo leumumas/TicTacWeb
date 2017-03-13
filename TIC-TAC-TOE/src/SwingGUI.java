@@ -17,7 +17,7 @@ public class SwingGUI extends JFrame {
  	public GridLayout gl;
     private Image Background;
     private JLabel lblBackgroundImage = new JLabel();
-    private JLabel TitleText;
+    protected JLabel TitleText;
     private JLabel TurnText;
     	
     //Construction of the UI by slice
@@ -80,6 +80,18 @@ public class SwingGUI extends JFrame {
         
         lblBackgroundImage.add(GridZone);
         add(lblBackgroundImage);
+	}
+	
+	public void ResetGrid() 
+	{
+		for (int i = 0; i < 3; i++ )
+        { 
+        	for (int j = 0; j < 3; j++ )
+        	{
+        		Cases[i][j].tileChange(0);
+        		System.out.println("Reset");
+        	}
+        }
 	}
 	
 	public static void main (String[] args)

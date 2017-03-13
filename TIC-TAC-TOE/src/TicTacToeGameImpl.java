@@ -53,7 +53,15 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 			gameState = GameState.CLIENT_TURN; 
 			client.setClientPlay(new int[] {tileX, tileY});
 			TimeUnit.MILLISECONDS.sleep(50);
-			if (checkRow(tileX, tileY) == 3 || checkColumn(tileX, tileY) == 3 || checkDiagonal(tileX, tileY) == 3) {
+			int casesRes = 9;
+			for(int row = 0; row < 3; row++)
+				for(int col = 0; col < 3; col++) {
+					if (grid[row][col] !=0)
+						casesRes--;
+				}
+			if (casesRes <= 0) { //Vérifie, si personne n'as gagné, un match nul
+				gameIssue(false);
+			} else if (checkRow(tileX, tileY) == 3 || checkColumn(tileX, tileY) == 3 || checkDiagonal(tileX, tileY) == 3) {
 				gameIssue(true);
 			}
 			else {
@@ -125,12 +133,14 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 	
 	@Override
 	public void restartGame() throws RemoteException {
-
+		gameState = GameState.PLAYING; 
+		for(int row = 0; row < 3; row++)
+			for(int col = 0; col < 3; col++)
+				grid[row][col] = 0;		
 	}	
 	
 	@Override
 	public GameState getGameState() {
 		return gameState;
 	}
-
-}
+	}
