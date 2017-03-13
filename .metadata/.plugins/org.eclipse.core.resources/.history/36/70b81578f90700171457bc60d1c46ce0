@@ -88,17 +88,17 @@ public class ClientTicTac extends SwingGUI {
 				} 
 				else if (state == GameState.ENDED) {
 					issue = player.getGameIssue ();
-					int casesRes = tictac.getCasesRes();
+					int casesRes = player.getCasesRes();
 					if(issue) {
-						this.TitleText.setText("You WIN click: Restart");
+						this.TitleText.setText("You WIN");
 						System.out.println("Player win !");//play win anim
 					}
 					else if (casesRes > 0){
-						this.TitleText.setText("You LOSE click: Restart");
+						this.TitleText.setText("You LOSE");
 						System.out.println("Player lose !");//play lose anim
 					}
 					else
-						this.TitleText.setText("Match nul click: Restart");
+						this.TitleText.setText("Match nul");
 						
 				}
 			}

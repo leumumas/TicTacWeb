@@ -7,5 +7,4 @@ public interface TicTacToeGame extends Remote {
 	public void restartGame() throws RemoteException;
 	public void gameIssue(boolean issue) throws RemoteException;
 	public GameState getGameState() throws RemoteException;
-	public int getCasesRes() throws RemoteException;
 }
