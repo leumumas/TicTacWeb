@@ -8,12 +8,11 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import javax.swing.JFrame;
-
 public class ClientTicTac extends SwingGUI {
 
 	TicTacToeGame tictac = null;
 	public TicTacPlayer player = null;
+	public int clientV, aiV;
 	
 	public ClientTicTac(String title) {
 		super(title);
@@ -47,13 +46,23 @@ public class ClientTicTac extends SwingGUI {
 		catch (Exception e) {
 		     System.out.println("Erreur à l'accès de la game" + e);
 		}
-		selectType(1); // le client joue toujours les X
 	}
 	
 	// Permet au joueur de choisir entre jouer 'X'ou 'O'
-	public void selectType(int xo) {
+	public void selectType() {
+		Object[] options = {"X", "O"};
+		if (JOptionPane.showOptionDialog(this, 
+                "Que voulez-vous jouer ? (X ou O)", 
+                "Choix de Tic ou Tac", 
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, null) == JOptionPane.OK_OPTION) {
+			clientV = 1; aiV = 2;
+		}
+		else {
+			clientV = 2; aiV = 1;
+		}
 		try {
-			player = tictac.newPlayer(xo);
+			player = tictac.newPlayer(clientV);
 		}
 		catch (Exception e) {
 			System.out.println("Erreur à la création d'un Joueur : " + e);
@@ -89,11 +98,11 @@ public class ClientTicTac extends SwingGUI {
 				GameState state = tictac.getGameState();
 				if(state == GameState.CLIENT_TURN) { 		// Si c'est le tour du joueur
 					int[]cP = player.getClientPlay();		// Recupère la Case sélectionnée
-					Cases[cP[0]][cP[1]].tileChange(1);		// Change la case en X 
+					Cases[cP[0]][cP[1]].tileChange(clientV);		// Change la case en X 
 				}
 				else if (state == GameState.AI_TURN) { 		// Si c'est le tour de l'IA
 					int[] aiP = player.getAIPlay();			// Recupère la Case sélectionnée
-					Cases[aiP[0]][aiP[1]].tileChange(2);	// Change la case en O
+					Cases[aiP[0]][aiP[1]].tileChange(aiV);	// Change la case en O
 				} 
 				else if (state == GameState.ENDED) {		// Si c'est la game est finie
 					issue = player.getGameIssue ();			// Vérifie si le client a gagné
@@ -120,6 +129,7 @@ public class ClientTicTac extends SwingGUI {
 			catch (RemoteException i) {}
 		}
 	}
+	
 
 	public static void main(String args[]) {
 		ClientTicTac client = new ClientTicTac("TicToeGame"); // Initialise la fenêtre de jeu

@@ -11,12 +11,12 @@ public class MainGame {
 	{
 	    String[] arguments = new String[] {"Start"};
 		Server = new ServerGame();
-		ServerGame.main(arguments);
 		Game = new ClientTicTac("TicToeGame");
 		Game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Game.pack ();
 		Game.setLocationRelativeTo(null);
 		Game.setVisible(true);
+		Game.selectType();
 		Game.checkGameIssue ();
 	}
 }

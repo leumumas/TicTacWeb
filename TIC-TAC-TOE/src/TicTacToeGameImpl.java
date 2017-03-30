@@ -23,7 +23,7 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 	
 	// Crée un nouveau joueur et un nouvel IA donc une nouvelle game
 	@Override
-	public TicTacPlayer newPlayer(int typeXO) throws RemoteException {
+	public TicTacPlayer newPlayer(int typeXO) throws RemoteException, InterruptedException {
 		int aiType;
 		if (typeXO == 1) {
 			aiType = 2;
@@ -40,7 +40,8 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 		ai = new AIPlayerMinimax(grid, aiType);
 		
 		gameState = GameState.PLAYING; 
-		
+		if(aiType == 1)
+			playAI();
 		return client;
 	}
 	
@@ -69,18 +70,22 @@ public class TicTacToeGameImpl extends UnicastRemoteObject implements TicTacToeG
 				gameIssue(true);
 			}
 			else {
-				ai.UpdateGrid(grid); 					// Met à jour la grid de l'IA pour lui permettre de faire le bon choix
-				int aiTypeXO = ai.getTypeXO();
-				int[] aiPlay = ai.Move();
-				grid[aiPlay[0]][aiPlay[1]] = aiTypeXO;
-				gameState = GameState.AI_TURN; 
-				client.setAiPlay(aiPlay); 				// Renvoie le move de l'IA pour mettre à jour l'affichage
-				TimeUnit.MILLISECONDS.sleep(50);
-														// Vérifie si l'IA a gagné, si oui envoie au joueur qu'il a perdu
-				if (checkRow(aiPlay[0], aiPlay[1]) == 3 || checkColumn(aiPlay[0], aiPlay[1]) == 3 || checkDiagonal(aiPlay[0], aiPlay[1]) == 3) {
-					gameIssue(false);
-				}
+				playAI();
 			}
+		}
+	}
+	
+	private void playAI() throws RemoteException, InterruptedException {
+		ai.UpdateGrid(grid); 					// Met à jour la grid de l'IA pour lui permettre de faire le bon choix
+		int aiTypeXO = ai.getTypeXO();
+		int[] aiPlay = ai.Move();
+		grid[aiPlay[0]][aiPlay[1]] = aiTypeXO;
+		gameState = GameState.AI_TURN; 
+		client.setAiPlay(aiPlay); 				// Renvoie le move de l'IA pour mettre à jour l'affichage
+		TimeUnit.MILLISECONDS.sleep(50);
+												// Vérifie si l'IA a gagné, si oui envoie au joueur qu'il a perdu
+		if (checkRow(aiPlay[0], aiPlay[1]) == 3 || checkColumn(aiPlay[0], aiPlay[1]) == 3 || checkDiagonal(aiPlay[0], aiPlay[1]) == 3) {
+			gameIssue(false);
 		}
 	}
 
